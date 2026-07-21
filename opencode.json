@@ -1,0 +1,55 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "OPENCODE_SKILLS.md"
+  ],
+  "references": {
+    "docs": {
+      "path": ".",
+      "description": "Project README, human-facing SKILLS.md, BUILD_PROMPT.md phase plan, and REVIEW.md checklist"
+    }
+  },
+  "commands": {
+    "backend:run": {
+      "command": "cd backend && mvn spring-boot:run",
+      "description": "Start the Spring Boot backend (requires Postgres + Redis already running via docker compose)"
+    },
+    "backend:build": {
+      "command": "cd backend && mvn clean compile",
+      "description": "Compile the backend and surface any errors, without starting the server"
+    },
+    "backend:test": {
+      "command": "cd backend && mvn test",
+      "description": "Run backend unit/integration tests"
+    },
+    "frontend:run": {
+      "command": "cd frontend && ng serve",
+      "description": "Start the Angular dev server on http://localhost:4200"
+    },
+    "frontend:build": {
+      "command": "cd frontend && ng build",
+      "description": "Production build of the Angular app, surfaces TypeScript errors"
+    },
+    "infra:up": {
+      "command": "docker compose up -d",
+      "description": "Start Postgres and Redis containers"
+    },
+    "infra:down": {
+      "command": "docker compose down",
+      "description": "Stop Postgres and Redis containers"
+    },
+    "infra:logs": {
+      "command": "docker compose logs -f",
+      "description": "Tail logs from Postgres and Redis containers"
+    },
+    "db:psql": {
+      "command": "docker exec -it $(docker compose ps -q postgres) psql -U tg_user -d transactionguard",
+      "description": "Open a psql shell into the running Postgres container"
+    },
+    "db:redis-cli": {
+      "command": "docker exec -it $(docker compose ps -q redis) redis-cli",
+      "description": "Open a redis-cli shell into the running Redis container"
+    }
+  }
+}
