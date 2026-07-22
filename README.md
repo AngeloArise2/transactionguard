@@ -90,4 +90,3 @@ See `.env.example` for required configuration (JWT signing secret, DB credential
 
 ## Screenshots
 
-_(add screenshots or a short screen recording of the live dashboard here before sharing this repo)_
