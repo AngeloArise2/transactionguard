@@ -4,52 +4,30 @@
     "AGENTS.md",
     "OPENCODE_SKILLS.md"
   ],
-  "references": {
-    "docs": {
-      "path": ".",
-      "description": "Project README, human-facing SKILLS.md, BUILD_PROMPT.md phase plan, and REVIEW.md checklist"
-    }
-  },
-  "commands": {
-    "backend:run": {
-      "command": "cd backend && mvn spring-boot:run",
-      "description": "Start the Spring Boot backend (requires Postgres + Redis already running via docker compose)"
+  "command": {
+    "infra-up": {
+      "template": "Run `docker compose up -d`, then run `docker ps` and confirm both the postgres and redis containers show as healthy. Report the result plainly.",
+      "description": "Start Postgres and Redis containers and confirm they're healthy"
     },
-    "backend:build": {
-      "command": "cd backend && mvn clean compile",
-      "description": "Compile the backend and surface any errors, without starting the server"
-    },
-    "backend:test": {
-      "command": "cd backend && mvn test",
-      "description": "Run backend unit/integration tests"
-    },
-    "frontend:run": {
-      "command": "cd frontend && ng serve",
-      "description": "Start the Angular dev server on http://localhost:4200"
-    },
-    "frontend:build": {
-      "command": "cd frontend && ng build",
-      "description": "Production build of the Angular app, surfaces TypeScript errors"
-    },
-    "infra:up": {
-      "command": "docker compose up -d",
-      "description": "Start Postgres and Redis containers"
-    },
-    "infra:down": {
-      "command": "docker compose down",
+    "infra-down": {
+      "template": "Run `docker compose down` to stop the Postgres and Redis containers. Confirm they've stopped.",
       "description": "Stop Postgres and Redis containers"
     },
-    "infra:logs": {
-      "command": "docker compose logs -f",
-      "description": "Tail logs from Postgres and Redis containers"
+    "backend-run": {
+      "template": "Run the Spring Boot backend with `cd backend && mvn spring-boot:run`, and report whether it boots cleanly or show me the first error if it doesn't.",
+      "description": "Start the Spring Boot backend"
     },
-    "db:psql": {
-      "command": "docker exec -it $(docker compose ps -q postgres) psql -U tg_user -d transactionguard",
-      "description": "Open a psql shell into the running Postgres container"
+    "backend-build": {
+      "template": "Run `cd backend && mvn clean compile` and report any compile errors, without starting the server.",
+      "description": "Compile the backend only, surface errors"
     },
-    "db:redis-cli": {
-      "command": "docker exec -it $(docker compose ps -q redis) redis-cli",
-      "description": "Open a redis-cli shell into the running Redis container"
+    "frontend-run": {
+      "template": "Run the Angular dev server with `cd frontend && ng serve` and confirm it's serving on http://localhost:4200.",
+      "description": "Start the Angular dev server"
+    },
+    "db-inspect": {
+      "template": "Run `docker exec -it transactionguard-postgres psql -U tg_user -d transactionguard -c \"\\dt\"` and show me the list of tables that currently exist.",
+      "description": "List current Postgres tables"
     }
   }
 }
