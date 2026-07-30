@@ -5,6 +5,7 @@ import com.transactionguard.dto.TransactionResponseDto;
 import com.transactionguard.entity.Transaction;
 import com.transactionguard.exception.ResourceNotFoundException;
 import com.transactionguard.repository.TransactionRepository;
+import com.transactionguard.service.AnomalyDetectionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final AnomalyDetectionService anomalyDetectionService;
 
     @Transactional
     public TransactionResponseDto create(TransactionRequestDto request) {
@@ -27,7 +29,9 @@ public class TransactionService {
                 .category(request.category())
                 .occurredAt(Instant.now())
                 .build();
-        return toDto(transactionRepository.save(transaction));
+        transaction = transactionRepository.save(transaction);
+        transaction = anomalyDetectionService.checkAndScore(transaction);
+        return toDto(transaction);
     }
 
     public TransactionResponseDto findById(Long id) {

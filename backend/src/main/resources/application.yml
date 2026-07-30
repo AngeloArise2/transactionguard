@@ -30,6 +30,8 @@ app:
   anomaly:
     threshold-multiplier: 3.0
     ema-alpha: 0.3
+  generator:
+    interval-ms: 5000
 
 logging:
   level:
