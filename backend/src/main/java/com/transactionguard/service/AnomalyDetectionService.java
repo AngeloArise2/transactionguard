@@ -1,10 +1,14 @@
 package com.transactionguard.service;
 
+import com.transactionguard.dto.FlaggedTransactionDto;
+import com.transactionguard.entity.Customer;
 import com.transactionguard.entity.Transaction;
+import com.transactionguard.repository.CustomerRepository;
 import com.transactionguard.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +18,8 @@ public class AnomalyDetectionService {
 
     private final StringRedisTemplate redisTemplate;
     private final TransactionRepository transactionRepository;
+    private final CustomerRepository customerRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${app.anomaly.threshold-multiplier}")
     private double thresholdMultiplier;
@@ -38,11 +44,26 @@ public class AnomalyDetectionService {
             double multiple = amount / currentAvg;
             transaction.setFlagged(true);
             transaction.setFlagReason(String.format("Amount is %.1fx customer's rolling average", multiple));
+            messagingTemplate.convertAndSend("/topic/flagged-transactions", toFlaggedDto(transaction));
         }
 
         double newAvg = (emaAlpha * amount) + ((1 - emaAlpha) * currentAvg);
         redisTemplate.opsForValue().set(key, String.valueOf(newAvg));
 
         return transactionRepository.save(transaction);
+    }
+
+    private FlaggedTransactionDto toFlaggedDto(Transaction transaction) {
+        String customerName = customerRepository.findById(transaction.getCustomerId())
+                .map(Customer::getName)
+                .orElse("Unknown");
+        return new FlaggedTransactionDto(
+                transaction.getId(),
+                customerName,
+                transaction.getAmount(),
+                transaction.getMerchant(),
+                transaction.getFlagReason(),
+                transaction.getOccurredAt()
+        );
     }
 }
