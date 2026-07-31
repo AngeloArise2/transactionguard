@@ -16,7 +16,9 @@
 
     <section class="card feed-card">
       <h2>Live flagged feed</h2>
-      @if (flaggedTransactions().length === 0) {
+      @if (flaggedTransactions().length === 0 && connectionStatus() === 'connecting') {
+        <p class="empty">Connecting to live feed…</p>
+      } @else if (flaggedTransactions().length === 0) {
         <p class="empty">Waiting for flagged transactions…</p>
       } @else {
         <ul class="feed">

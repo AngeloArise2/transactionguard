@@ -10,14 +10,22 @@
 
   <div class="toolbar">
     <label for="customer">Customer</label>
-    <select id="customer" [ngModel]="selectedCustomerId()" (ngModelChange)="onCustomerChange($event)">
-      @for (customer of customers(); track customer.id) {
-        <option [ngValue]="customer.id">{{ customer.name }} — {{ customer.email }}</option>
-      }
-    </select>
+    @if (loading() && customers().length === 0) {
+      <span class="empty">Loading customers…</span>
+    } @else if (customers().length === 0) {
+      <span class="empty">No customers yet — create one first.</span>
+    } @else {
+      <select id="customer" [ngModel]="selectedCustomerId()" (ngModelChange)="onCustomerChange($event)">
+        @for (customer of customers(); track customer.id) {
+          <option [ngValue]="customer.id">{{ customer.name }} — {{ customer.email }}</option>
+        }
+      </select>
+    }
   </div>
 
-  @if (transactions().length === 0) {
+  @if (loading()) {
+    <p class="empty">Loading…</p>
+  } @else if (transactions().length === 0) {
     <p class="empty">No transactions for this customer yet.</p>
   } @else {
     <table class="table">

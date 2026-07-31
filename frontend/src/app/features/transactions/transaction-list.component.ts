@@ -20,9 +20,11 @@ export class TransactionListComponent implements OnInit {
   protected readonly customers = signal<CustomerResponse[]>([]);
   protected readonly transactions = signal<TransactionResponse[]>([]);
   protected readonly selectedCustomerId = signal<number | null>(null);
+  protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
 
   ngOnInit(): void {
+    this.loading.set(true);
     this.customerService.getAll().subscribe({
       next: (page) => {
         this.customers.set(page.content);
@@ -30,17 +32,28 @@ export class TransactionListComponent implements OnInit {
           // Auto-select the first customer so the table has content on first paint.
           this.onCustomerChange(page.content[0].id);
         }
+        this.loading.set(false);
       },
-      error: () => this.error.set('Failed to load customers'),
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Failed to load customers');
+      },
     });
   }
 
   onCustomerChange(customerId: number): void {
     this.selectedCustomerId.set(customerId);
     this.error.set(null);
+    this.loading.set(true);
     this.transactionService.findByCustomerId(customerId).subscribe({
-      next: (transactions) => this.transactions.set(transactions),
-      error: () => this.error.set('Failed to load transactions'),
+      next: (transactions) => {
+        this.transactions.set(transactions);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Failed to load transactions');
+      },
     });
   }
 

@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from '../../core/auth.service';
 
@@ -16,6 +17,7 @@ export class RegisterComponent {
   private readonly router = inject(Router);
 
   protected readonly error = signal<string | null>(null);
+  protected readonly submitting = signal(false);
   protected readonly form = this.fb.nonNullable.group({
     username: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(8)]],
@@ -23,7 +25,7 @@ export class RegisterComponent {
   });
 
   onSubmit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.submitting()) {
       return;
     }
     const { username, password, confirmPassword } = this.form.getRawValue();
@@ -33,9 +35,16 @@ export class RegisterComponent {
       return;
     }
     this.error.set(null);
+    this.submitting.set(true);
     this.authService.register({ username, password }).subscribe({
       next: () => this.router.navigate(['/login']),
-      error: () => this.error.set('Registration failed — username may already be taken'),
+      error: (error: HttpErrorResponse) => {
+        this.submitting.set(false);
+        // A 400 from the API means the username is taken; anything else is already toasted.
+        if (error.status === 400) {
+          this.error.set('Username is already taken');
+        }
+      },
     });
   }
 }

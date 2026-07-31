@@ -1,0 +1,28 @@
+.toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  min-width: 240px;
+  max-width: 360px;
+
+  &-error {
+    background: #dc2626;
+  }
+
+  &-success {
+    background: #059669;
+  }
+}

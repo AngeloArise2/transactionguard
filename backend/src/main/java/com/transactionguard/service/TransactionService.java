@@ -4,6 +4,7 @@ import com.transactionguard.dto.TransactionRequestDto;
 import com.transactionguard.dto.TransactionResponseDto;
 import com.transactionguard.entity.Transaction;
 import com.transactionguard.exception.ResourceNotFoundException;
+import com.transactionguard.repository.CustomerRepository;
 import com.transactionguard.repository.TransactionRepository;
 import com.transactionguard.service.AnomalyDetectionService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +20,14 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final AnomalyDetectionService anomalyDetectionService;
+    private final CustomerRepository customerRepository;
 
     @Transactional
     public TransactionResponseDto create(TransactionRequestDto request) {
+        // Resolve a bad customer FK as 404 up-front instead of a raw constraint violation (500).
+        if (!customerRepository.existsById(request.customerId())) {
+            throw new ResourceNotFoundException("Customer", request.customerId());
+        }
         Transaction transaction = Transaction.builder()
                 .customerId(request.customerId())
                 .amount(request.amount())

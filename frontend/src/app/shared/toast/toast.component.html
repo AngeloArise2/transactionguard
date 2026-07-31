@@ -1,0 +1,9 @@
+@if (toastService.toasts().length > 0) {
+  <div class="toast-container">
+    @for (toast of toastService.toasts(); track toast.id) {
+      <div class="toast" [class.toast-error]="toast.type === 'error'" [class.toast-success]="toast.type === 'success'">
+        {{ toast.message }}
+      </div>
+    }
+  </div>
+}

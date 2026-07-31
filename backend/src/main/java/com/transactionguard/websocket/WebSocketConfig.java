@@ -1,4 +1,4 @@
-package com.transactionguard.config;
+package com.transactionguard.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

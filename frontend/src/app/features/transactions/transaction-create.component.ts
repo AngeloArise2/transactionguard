@@ -19,6 +19,8 @@ export class TransactionCreateComponent implements OnInit {
   private readonly router = inject(Router);
 
   protected readonly customers = signal<CustomerResponse[]>([]);
+  protected readonly loading = signal(false);
+  protected readonly submitting = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly form = this.fb.nonNullable.group({
     customerId: [0, [Validators.required, Validators.min(1)]],
@@ -28,23 +30,29 @@ export class TransactionCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loading.set(true);
     this.customerService.getAll().subscribe({
       next: (page) => {
         this.customers.set(page.content);
         if (page.content.length > 0) {
           this.form.controls.customerId.setValue(page.content[0].id);
         }
+        this.loading.set(false);
       },
-      error: () => this.error.set('Failed to load customers'),
+      error: () => {
+        this.loading.set(false);
+        this.error.set('Failed to load customers');
+      },
     });
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
+    if (this.form.invalid || this.submitting()) {
       return;
     }
     const value = this.form.getRawValue();
     this.error.set(null);
+    this.submitting.set(true);
     this.transactionService
       .create({
         customerId: value.customerId,
@@ -54,7 +62,10 @@ export class TransactionCreateComponent implements OnInit {
       })
       .subscribe({
         next: () => this.router.navigate(['/transactions']),
-        error: () => this.error.set('Failed to create transaction'),
+        error: () => {
+          this.submitting.set(false);
+          this.error.set('Failed to create transaction');
+        },
       });
   }
 }

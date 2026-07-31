@@ -12,7 +12,7 @@ This file governs how the agent should work in this repository. Read this in ful
 
 | Layer | Technology | Notes |
 |---|---|---|
-| Backend | Java 17+, Spring Boot 3.x | Use Spring Initializr conventions |
+| Backend | Java 17+, Spring Boot 3.x/4.x | Use Spring Initializr conventions. Note: this repo currently builds on Spring Boot 4.0.7. |
 | Backend build tool | Maven | Not Gradle |
 | Persistence | Spring Data JPA + Hibernate | |
 | Database | PostgreSQL 15+ | Run via Docker Compose locally |

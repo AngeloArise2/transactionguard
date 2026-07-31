@@ -13,7 +13,9 @@
     <label for="password">Password</label>
     <input id="password" type="password" formControlName="password" autocomplete="current-password" />
 
-    <button type="submit" [disabled]="form.invalid">Log in</button>
+    <button type="submit" [disabled]="form.invalid || submitting()">
+      {{ submitting() ? 'Logging in…' : 'Log in' }}
+    </button>
   </form>
 
   <p class="footer">

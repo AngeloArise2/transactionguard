@@ -18,7 +18,9 @@
     <label for="confirmPassword">Confirm password</label>
     <input id="confirmPassword" type="password" formControlName="confirmPassword" autocomplete="new-password" />
 
-    <button type="submit" [disabled]="form.invalid">Register</button>
+    <button type="submit" [disabled]="form.invalid || submitting()">
+      {{ submitting() ? 'Creating account…' : 'Register' }}
+    </button>
   </form>
 
   <p class="footer">

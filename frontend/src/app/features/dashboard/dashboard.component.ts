@@ -2,6 +2,7 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { DatePipe } from '@angular/common';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
+import { Subscription } from 'rxjs';
 
 import { WebsocketService } from '../../core/websocket.service';
 import { FlaggedTransaction } from '../../core/interfaces';
@@ -36,6 +37,7 @@ function buildBuckets(events: FlaggedTransaction[]): { labels: string[]; counts:
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private readonly websocketService = inject(WebsocketService);
+  private statusSubscription: Subscription | null = null;
 
   protected readonly flaggedTransactions = this.websocketService.flaggedTransactions;
   protected readonly connectionStatus = signal<string>('connecting');
@@ -73,11 +75,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.websocketService.connect();
     // STOMP reconnects on its own; reflect the state once the first connection is established.
-    this.websocketService.onStatusChange.subscribe((status) => this.connectionStatus.set(status));
+    // Unsubscribe only our own Subscription — never the shared Subject itself.
+    this.statusSubscription = this.websocketService.onStatusChange.subscribe((status) =>
+      this.connectionStatus.set(status),
+    );
   }
 
   ngOnDestroy(): void {
-    this.websocketService.onStatusChange.unsubscribe();
+    this.statusSubscription?.unsubscribe();
     this.websocketService.disconnect();
   }
 
