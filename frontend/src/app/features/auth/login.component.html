@@ -1,0 +1,22 @@
+<div class="auth-card">
+  <h1>TransactionGuard</h1>
+  <p class="subtitle">Sign in to monitor transactions</p>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <label for="username">Username</label>
+    <input id="username" type="text" formControlName="username" autocomplete="username" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+
+    <button type="submit" [disabled]="form.invalid">Log in</button>
+  </form>
+
+  <p class="footer">
+    No account? <a routerLink="/register">Register</a>
+  </p>
+</div>

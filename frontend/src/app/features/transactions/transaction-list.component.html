@@ -1,0 +1,54 @@
+<div class="page">
+  <div class="header">
+    <h1>Transactions</h1>
+    <a class="btn" routerLink="/transactions/new">+ New transaction</a>
+  </div>
+
+  @if (error()) {
+    <div class="alert alert-error">{{ error() }}</div>
+  }
+
+  <div class="toolbar">
+    <label for="customer">Customer</label>
+    <select id="customer" [ngModel]="selectedCustomerId()" (ngModelChange)="onCustomerChange($event)">
+      @for (customer of customers(); track customer.id) {
+        <option [ngValue]="customer.id">{{ customer.name }} — {{ customer.email }}</option>
+      }
+    </select>
+  </div>
+
+  @if (transactions().length === 0) {
+    <p class="empty">No transactions for this customer yet.</p>
+  } @else {
+    <table class="table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>Merchant</th>
+          <th>Category</th>
+          <th>When</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tx of transactions(); track tx.id) {
+          <tr>
+            <td>{{ tx.id }}</td>
+            <td>{{ formatAmount(tx.amount) }}</td>
+            <td>{{ tx.merchant }}</td>
+            <td>{{ tx.category ?? '—' }}</td>
+            <td>{{ tx.occurredAt | date: 'short' }}</td>
+            <td>
+              @if (tx.flagged) {
+                <span class="badge badge-flag" [title]="tx.flagReason ?? ''">Flagged</span>
+              } @else {
+                <span class="badge badge-ok">Normal</span>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
