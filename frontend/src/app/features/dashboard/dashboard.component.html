@@ -1,0 +1,40 @@
+<div class="page">
+  <div class="header">
+    <h1>Live Dashboard</h1>
+    <span class="status" [class.online]="connectionStatus() === 'connected'">
+      <span class="dot"></span>{{ connectionStatus() }}
+    </span>
+  </div>
+
+  <div class="grid">
+    <section class="card chart-card">
+      <h2>Flagged transactions — last 10 minutes</h2>
+      <div class="chart">
+        <canvas baseChart [type]="'bar'" [data]="chartData()" [options]="chartOptions"></canvas>
+      </div>
+    </section>
+
+    <section class="card feed-card">
+      <h2>Live flagged feed</h2>
+      @if (flaggedTransactions().length === 0) {
+        <p class="empty">Waiting for flagged transactions…</p>
+      } @else {
+        <ul class="feed">
+          @for (item of flaggedTransactions(); track item.transactionId) {
+            <li class="feed-item">
+              <span class="badge" [title]="item.reason">FLAGGED</span>
+              <div class="details">
+                <div class="line1">
+                  <strong>{{ item.customerName }}</strong>
+                  <span class="amount">{{ formatAmount(item.amount) }}</span>
+                </div>
+                <div class="line2">{{ item.merchant }} · {{ item.reason }}</div>
+                <div class="line3">{{ item.timestamp | date: 'medium' }}</div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</div>
